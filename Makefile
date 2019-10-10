@@ -1,6 +1,6 @@
 all: oberon
 
-oberon.tab.c oberon.tab.h:	oberon.y
+oberon.tab.c oberon.tab.h: oberon.y
 	bison -d oberon.y
 
 lex.yy.c: oberon.l oberon.tab.h
