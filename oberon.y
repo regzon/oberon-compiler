@@ -40,407 +40,457 @@
 %token D_PIP D_LBR D_RBR D_LSQBR D_RSQBR D_LCURBR D_RCURBR D_DDOT O_GT
 %token O_GTE O_LT O_LTE O_NOTEQ O_EQ O_POINT O_ASS   
 
-%type <node> CompilationUnit
+%type <node> Identifier IdentDef IdentDefList Qualident FormalTypeSequence FormalType 
+%type <node> IdentList FormalParametersSection FormalResult FormalArguments FormalParameters 
+%type <node> ProcedureType PointerType FieldList FieldListSequence BaseType RecordFields
+%type <node> RecordInheritance RecordType LengthList Length ArrayType Type ExpList 
+%type <node> ActualParameter Selector SelectorSequence Designator Element Elements Set Number
+%type <node> Factor MulOperator Term AddOperator AddSequence PlusMinus SimpleExpression Relation
+%type <node> Expression ModuleBody ByStatement ForStatement RepeatStatement WhileElseifStatement
+%type <node> WhileStatement Label LabelRange CaseLabelList Case CaseSequence CaseStatement
+%type <node> ElseStatement ElseIfSequence IfStatement ProcedureCall Assignment Statement
+%type <node> StatementList ProcedureReturn ProcedureBegin ProcedureBody ProcedureHeading
+%type <node> ProcedureDeclaration ProcedureSequence VarDeclaration VarSequence VarBlock
+%type <node> TypeDeclaration TypeSequence TypeBlock ConstExpression ConstDeclaration
+%type <node> ConstSequence ConstBlock DeclarationSequence ImportEntry ImportEntries
+%type <node> ImportList ModuleDeclaration Module ModuleList CompilationUnit
+
 
 %start CompilationUnit
 
 %%
 
 CompilationUnit
-    : ModuleList { struct Node** children; root = createNode("root", children, 0); }
+    : ModuleList { struct Node** children = {$1}; root = createNode("root", children, 1); }
     ;
     
 ModuleList
-    : Module ModuleList { }
-    | /* empty */
+    : Module ModuleList {struct Node** children = {$1, $2}; $$ = createNode("ModuleList", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
     
 Module
-    : K_MODULE Identifier D_SEM ModuleDeclaration { printf("CompilationUnit\n"); }
+    : K_MODULE Identifier D_SEM ModuleDeclaration { struct Node** children = {$2, $4}; $$ = createNode("Module", children, 2);  }
     ;
 
 ModuleDeclaration
-    : ImportList DeclarationSequence ModuleBody K_END Identifier D_DOT { printf("Inside ModuleDeclaration\n"); }
+    : ImportList DeclarationSequence ModuleBody K_END Identifier D_DOT { struct Node** children = {$1, $2, $3, $5};
+                                                                         $$ = createNode("ModuleDeclaration", children, 4); }
     ;
 
 ImportList
-    : K_IMPORT ImportEntries D_SEM { printf("Inside ImportList\n"); }
-    | /* empty */
+    : K_IMPORT ImportEntries D_SEM { struct Node** children = {$2}; $$ = createNode("ImportList", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ImportEntries
-    : ImportEntry
-    | ImportEntries D_COM ImportEntry { printf("Inside ImportEntries\n"); }
+    : ImportEntry {struct Node** children = {$1}; $$ = createNode("ImportList", children, 1);}
+    | ImportEntries D_COM ImportEntry { struct Node** children = {$1, $3}; $$ = createNode("ImportList", children, 2); }
     ;
 
 ImportEntry
-    : Identifier { printf("Inside ImportEntry\n"); }
+    : Identifier { struct Node** children = {$1}; $$ = createNode("ImportEntry", children, 1); }
     | Identifier O_ASS Identifier
     ;
 
 DeclarationSequence
-    : ConstBlock TypeBlock VarBlock ProcedureSequence { printf("Inside DeclarationSequence\n"); }
+    : ConstBlock TypeBlock VarBlock ProcedureSequence { struct Node** children = {$1, $2, $3, $4}; 
+                                        $$ = createNode("DeclarationSequence", children, 4); }
     ;
 
 ConstBlock
-    : K_CONST ConstSequence { printf("Inside ConstBlock\n"); }
-    | /* empty */
+    : K_CONST ConstSequence { struct Node** children = {$2}; $$ = createNode("ConstBlock", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ConstSequence
-    : ConstDeclaration D_SEM ConstSequence { printf("Inside ConstSequence\n"); }
-    | /* empty */
+    : ConstDeclaration D_SEM ConstSequence { struct Node** children = {$1, $3}; $$ = createNode("ConstSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ConstDeclaration
-    : Identifier O_EQ ConstExpression { printf("Inside ConstDeclaration\n"); }
+    : Identifier O_EQ ConstExpression { struct Node** children = {$1, $3}; $$ = createNode("ConstDeclaration", children, 2); }
     ;
 
 ConstExpression
-    : Expression { printf("Inside ConstExpression\n"); }
+    : Expression { struct Node** children = {$1}; $$ = createNode("ConstExpression", children, 1); }
     ;
 
 TypeBlock
-    : K_TYPE TypeSequence { printf("Inside TypeBlock\n"); }
-    | /* empty */
+    : K_TYPE TypeSequence { struct Node** children = {$2}; $$ = createNode("TypeBlock", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 TypeSequence
-    : TypeDeclaration D_SEM TypeSequence { printf("Inside TypeSequence\n"); }
-    | /* empty */
+    : TypeDeclaration D_SEM TypeSequence { struct Node** children = {$1, $3}; $$ = createNode("TypeSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 TypeDeclaration
-    : IdentDef O_EQ Type { printf("Inside TypeDeclaration\n"); }
+    : IdentDef O_EQ Type { struct Node** children = {$1, $3}; $$ = createNode("TypeDeclaration", children, 2); }
     ;
 
 VarBlock
-    : K_VAR VarSequence { printf("Inside VarBlock\n"); }
-    | /* empty */
+    : K_VAR VarSequence { struct Node** children = {$2}; $$ = createNode("VarBlock", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 VarSequence
-    : VarDeclaration D_SEM VarSequence { printf("Inside VarSequence\n"); }
-    | /* empty */
+    : VarDeclaration D_SEM VarSequence { struct Node** children = {$1, $3}; $$ = createNode("VarSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 VarDeclaration
-    : IdentDefList D_COL Type { printf("Inside VarDeclaration\n"); }
+    : IdentDefList D_COL Type { struct Node** children = {$1, $3}; $$ = createNode("VarDeclaration", children, 2); }
     ;
 
 ProcedureSequence
-    : ProcedureDeclaration D_SEM ProcedureSequence { printf("Inside ProcedureSequence\n"); }
-    | /* empty */
+    : ProcedureDeclaration D_SEM ProcedureSequence { struct Node** children = {$1, $3}; $$ = createNode("ProcedureSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ProcedureDeclaration
-    : ProcedureHeading D_SEM ProcedureBody Identifier { printf("Inside ProcedureDeclaration\n"); }
+    : ProcedureHeading D_SEM ProcedureBody Identifier { struct Node** children = {$1, $3, $4};
+                                             $$ = createNode("ProcedureDeclaration", children, 3); }
     ;
 
 ProcedureHeading
-    : K_PROCEDURE IdentDef { printf("Inside ProcedureHeading\n"); }
-    | K_PROCEDURE IdentDef FormalParameters
+    : K_PROCEDURE IdentDef { struct Node** children = {$2}; $$ = createNode("ProcedureHeading", children, 1); }
+    | K_PROCEDURE IdentDef FormalParameters { struct Node** children = {$2, $3}; $$ = createNode("ProcedureDeclaration", children, 2); }
     ;
 
 ProcedureBody
-    : DeclarationSequence ProcedureBegin ProcedureReturn K_END { printf("Inside ProcedureBody\n"); }
+    : DeclarationSequence ProcedureBegin ProcedureReturn K_END { struct Node** children = {$1, $2, $3}; 
+                                        $$ = createNode("ProcedureBody", children, 3); }
     ;
 
 ProcedureBegin
-    : K_BEGIN StatementList { printf("Inside ProcedureBegin\n"); }
-    | /* empty */
+    : K_BEGIN StatementList { struct Node** children = {$2}; $$ = createNode("ProcedureBegin", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ProcedureReturn
-    : K_RETURN Expression { printf("Inside ProcedureReturn\n"); }
-    | /* empty */
+    : K_RETURN Expression { struct Node** children = {$2}; $$ = createNode("ProcedureReturn", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 StatementList
-    : Statement { printf("Inside StatementList(solo)\n"); }
-    | StatementList D_SEM Statement { printf("Inside StatementList\n"); }
+    : Statement { struct Node** children = {$1}; $$ = createNode("StatementList", children, 1); }
+    | StatementList D_SEM Statement { struct Node** children = {$1, $3}; $$ = createNode("StatementList", children, 2); }
     ;
 
 Statement
-    : Assignment { printf("Inside Statement(Assignment)\n"); }
-    | ProcedureCall { printf("Inside Statement(ProcedureCall)\n"); }
-    | IfStatement { printf("Inside Statement(IfStatement)\n"); }
-    | CaseStatement { printf("Inside Statement(CaseStatement)\n"); }
-    | WhileStatement { printf("Inside Statement(WhileStatement)\n"); }
-    | RepeatStatement { printf("Inside Statement(RepeatStatement)\n"); }
-    | ForStatement { printf("Inside Statement(ForStatement)\n"); }
-    | /* empty */
+    : Assignment { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | ProcedureCall { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | IfStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | CaseStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | WhileStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | RepeatStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | ForStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 Assignment
-    : Designator O_ASS Expression { printf("Inside Assignment\n"); }
+    : Designator O_ASS Expression { struct Node** children = {$1, $3}; $$ = createNode("Assignment", children, 2); }
     ;
 
 ProcedureCall
-    : Designator ActualParameter
+    : Designator ActualParameter { struct Node** children = {$1, $2}; $$ = createNode("ProcedureCall", children, 2); }
     ;
 
 IfStatement
-    : K_IF Expression K_THEN StatementList ElseIfSequence ElseStatement K_END { printf("Inside IfStatement\n"); }
+    : K_IF Expression K_THEN StatementList ElseIfSequence ElseStatement K_END { struct Node** children = {$2, $4, $5, $6}; 
+                                                                    $$ = createNode("IfStatement", children, 4); }
     ;
 
 ElseIfSequence
-    : K_ELSIF Expression K_THEN StatementList ElseIfSequence { printf("Inside ElseIfSequence\n"); }
-    | /* empty */
+    : K_ELSIF Expression K_THEN StatementList ElseIfSequence { struct Node** children = {$2, $4, $5}; 
+                                                                $$ = createNode("ElseIfSequence", children, 3); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ElseStatement
-    : K_ELSE StatementList { printf("Inside ElseStatement\n"); }
-    | /* empty */
+    : K_ELSE StatementList { struct Node** children = {$2}; $$ = createNode("ElseStatement", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 CaseStatement
-    : K_CASE Expression K_OF Case CaseSequence K_END { printf("Inside CaseStatement\n"); }
+    : K_CASE Expression K_OF Case CaseSequence K_END { struct Node** children = {$2, $4, $5}; $$ = createNode("CaseStatement", children, 3); }
     ;
 
 CaseSequence
-    : D_PIP Case CaseSequence { printf("Inside CaseSequence\n"); }
-    | /* empty */
+    : D_PIP Case CaseSequence { struct Node** children = {$2, $3}; $$ = createNode("CaseSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 Case
-    : CaseLabelList D_COL StatementList { printf("Inside Case\n"); }
-    | /* empty */
+    : CaseLabelList D_COL StatementList { struct Node** children = {$1, $3}; $$ = createNode("Case", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 CaseLabelList
-    : LabelRange { printf("Inside CaseLabelList\n"); }
-    | CaseLabelList D_COM LabelRange
+    : LabelRange { struct Node** children = {$1}; $$ = createNode("CaseLabelList", children, 1); }
+    | CaseLabelList D_COM LabelRange { struct Node** children = {$1, $3}; $$ = createNode("CaseLabelList", children, 2); }
     ;
 
 LabelRange
-    : Label { printf("Inside LabelRange\n"); }
-    | Label D_DDOT Label
+    : Label { struct Node** children = {$1}; $$ = createNode("LabelRange", children, 1); }
+    | Label D_DDOT Label { struct Node** children = {$1, $3}; $$ = createNode("LabelRange", children, 2); }
     ;
 
 Label
-    : T_INTEGER | T_STRING | Qualident
+    : T_INTEGER  { struct Node** children; $$ = createNode("INTEGER", children, 0); }
+    | T_STRING { struct Node** children; $$ = createNode("STRING", children, 0); }
+    | Qualident { struct Node** children = {$1}; $$ = createNode("Label", children, 1); }
     ;
 
 WhileStatement
-    : K_WHILE Expression K_DO StatementList WhileElseifStatement K_END { printf("Inside WhileStatement\n"); }
+    : K_WHILE Expression K_DO StatementList WhileElseifStatement K_END { struct Node** children = {$2, $4, $5}; 
+                                                                        $$ = createNode("WhileStatement", children, 3); }
     ;
 
 WhileElseifStatement
-    : K_ELSIF Expression K_DO StatementList WhileElseifStatement { printf("Inside WhileElseifStatement\n"); }
-    | /* empty */
+    : K_ELSIF Expression K_DO StatementList WhileElseifStatement { struct Node** children = {$2, $4, $5}; 
+                                                                    $$ = createNode("WhileElseifStatement", children, 3); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 RepeatStatement
-    : K_REPEAT StatementList K_UNTIL Expression { printf("Inside RepeatStatement\n"); }
+    : K_REPEAT StatementList K_UNTIL Expression { struct Node** children = {$2, $4}; $$ = createNode("RepeatStatement", children, 2); }
     ;
 
 ForStatement
-    : K_FOR Identifier O_ASS Expression K_TO Expression ByStatement K_DO StatementList K_END { printf("Inside ForStatement\n"); }
+    : K_FOR Identifier O_ASS Expression K_TO Expression ByStatement K_DO StatementList K_END { struct Node** children = {$2, $4, $6, $7, $9}; 
+                                                                                    $$ = createNode("ForStatement", children, 5); }
     ;
 
 ByStatement
-    : K_BY ConstExpression { printf("Inside ByStatement\n"); }
-    | /* empty */
+    : K_BY ConstExpression { struct Node** children = {$2}; $$ = createNode("ByStatement", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ModuleBody
-    : K_BEGIN StatementList { printf("Inside ModuleBody\n"); }
-    | /* empty */
+    : K_BEGIN StatementList { struct Node** children = {$2}; $$ = createNode("ModuleBody", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 Expression
-    : SimpleExpression
-    | SimpleExpression Relation SimpleExpression
+    : SimpleExpression {struct Node** children = {$1}; $$ = createNode("Expression", children, 1);}
+    | SimpleExpression Relation SimpleExpression {struct Node** children = {$1, $2, $3}; $$ = createNode("Expression", children, 3);}
     ;
 
 Relation
-    : O_EQ | O_NOTEQ | O_LT | O_LTE | O_GT | O_GTE | K_IN | K_IS
+    : O_EQ { struct Node** children; $$ = createNode("==", children, 0); }
+    | O_NOTEQ { struct Node** children; $$ = createNode("#", children, 0); }
+    | O_LT { struct Node** children; $$ = createNode("<", children, 0); }
+    | O_LTE { struct Node** children; $$ = createNode("<=", children, 0); }
+    | O_GT { struct Node** children; $$ = createNode(">", children, 0); }
+    | O_GTE { struct Node** children; $$ = createNode(">=", children, 0); }
+    | K_IN { struct Node** children; $$ = createNode("IN", children, 0); }
+    | K_IS{ struct Node** children; $$ = createNode("IS", children, 0); }
     ;
 
 SimpleExpression
-    : PlusMinus Term AddSequence { printf("Inside SimpleExpression\n"); }
+    : PlusMinus Term AddSequence { struct Node** children = {$1, $2, $3}; $$ = createNode("SimpleExpression", children, 3); }
     ;
 
 PlusMinus
-    : O_ADD | O_SUB
-    | /* empty */
+    : O_ADD {struct Node** children; $$ = createNode("Plus", children, 0);}
+    | O_SUB {struct Node** children; $$ = createNode("Minus", children, 0);}
+    | /* empty */ { $$ = NULL;}
     ;
 
 AddSequence
-    : AddOperator Term AddSequence { printf("Inside AddSequence\n"); }
-    | /* empty */
+    : AddOperator Term AddSequence { struct Node** children = {$1, $2, $3}; $$ = createNode("AddSequence", children, 3); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 AddOperator
-    : O_ADD | O_SUB | K_OR
+    : O_ADD { struct Node** children; $$ = createNode("ADD", children, 0); }
+    | O_SUB { struct Node** children; $$ = createNode("SUBsSTRUCT", children, 0); }
+    | K_OR{ struct Node** children; $$ = createNode("OR", children, 0); }
     ;
 
 Term
-    : Factor { printf("Inside Term\n"); }
-    | Term MulOperator Factor
+    : Factor { struct Node** children = {$1}; $$ = createNode("Term", children, 1); }
+    | Term MulOperator Factor { struct Node** children = {$1, $2, $3}; $$ = createNode("Term", children, 3); }
     ;
 
 MulOperator
-    : O_MUL | O_DIV | K_DIV | K_MOD | O_AND
+    : O_MUL { struct Node** children; $$ = createNode("Multiplication", children, 0); }
+    | O_DIV { struct Node** children; $$ = createNode("Division", children, 0); }
+    | K_DIV { struct Node** children; $$ = createNode("/", children, 0); }
+    | K_MOD { struct Node** children; $$ = createNode("%", children, 0); }
+    | O_AND { struct Node** children; $$ = createNode("&", children, 0); }
     ;
 
 Factor
-    : Number | T_STRING | K_NIL | K_TRUE | K_FALSE
-    | Set | Designator ActualParameter
-    | D_LBR Expression D_RBR | O_NOT Factor
+    : Number { struct Node** children = {$1}; $$ = createNode("Factor", children, 1); }
+    | T_STRING { struct Node** children; $$ = createNode("String", children, 0); }
+    | K_NIL { struct Node** children; $$ = createNode("NIL", children, 0); }
+    | K_TRUE { struct Node** children; $$ = createNode("TRUE", children, 0); }
+    | K_FALSE { struct Node** children; $$ = createNode("FALSE", children, 0); }
+    | Set { struct Node** children = {$1}; $$ = createNode("Factor", children, 1); }
+    | Designator ActualParameter { struct Node** children = {$1, $2}; $$ = createNode("Factor", children, 2); }
+    | D_LBR Expression D_RBR  { struct Node** children = {$2}; $$ = createNode("Factor", children, 1); }
+    | O_NOT Factor { struct Node** children = {$2}; $$ = createNode("Factor", children, 1); }
     ;
 
 Number
-    : T_INTEGER | T_REAL
+    : T_INTEGER { struct Node** children; $$ = createNode("INTEGER", children, 0); }
+    | T_REAL { struct Node** children; $$ = createNode("REAL", children, 0); }
     ;
 
 Set
-    : D_LCURBR D_RCURBR
-    | D_LCURBR Elements D_RCURBR
+    : D_LCURBR D_RCURBR { struct Node** children; $$ = createNode("CURVE BR", children, 0); }
+    | D_LCURBR Elements D_RCURBR {{ struct Node** children = {$2}; $$ = createNode("Set", children, 1); }}
     ;
 
 Elements
-    : Element
-    | Elements D_COM Element { printf("Inside Elements\n"); }
+    : Element { struct Node** children = {$1}; $$ = createNode("Elements", children, 1); }
+    | Elements D_COM Element { struct Node** children = {$1, $3}; $$ = createNode("Elements", children, 2); }
     ;
 
 Element
-    : Expression
-    | Expression D_DDOT Expression
+    : Expression { struct Node** children = {$1}; $$ = createNode("Element", children, 1); }
+    | Expression D_DDOT Expression { struct Node** children = {$1, $3}; $$ = createNode("Element", children, 2); }
     ;
 
 Designator
-    : Qualident SelectorSequence { printf("Inside designator\n"); }
+    : Qualident SelectorSequence { struct Node** children = {$1, $2}; $$ = createNode("Designator", children, 2); }
     ;
 
 SelectorSequence
-    : Selector SelectorSequence { printf("Inside SelectorSequence\n"); }
-    | /* empty */
+    : Selector SelectorSequence { struct Node** children = {$1, $2}; $$ = createNode("SelectorSequence", children, 2); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 Selector
-    : D_DOT Identifier
-    | D_LSQBR ExpList D_RSQBR
-    | O_POINT
+    : D_DOT Identifier { struct Node** children = {$2}; $$ = createNode("Selector", children, 1); }
+    | D_LSQBR ExpList D_RSQBR { struct Node** children = {$2}; $$ = createNode("Selector", children, 1); }
+    | O_POINT { struct Node** children; $$ = createNode("POINTER", children, 0); }
     ;
 
 ActualParameter
-    : D_LBR D_RBR
-    | D_LBR ExpList D_RBR
-    | /* empty */
+    : D_LBR D_RBR { struct Node** children; $$ = createNode("NOT PARAM", children, 0); }
+    | D_LBR ExpList D_RBR { struct Node** children = {$2}; $$ = createNode("ActualParameter", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 ExpList
-    : Expression { printf("Inside ExpList(solo)\n"); }
-    | ExpList D_COM Expression
+    : Expression { struct Node** children = {$1}; $$ = createNode("ExpList", children, 1); }
+    | ExpList D_COM Expression { struct Node** children = {$1, $3}; $$ = createNode("ExpList", children, 2); }
     ;
 
 Type
-    : Qualident | ArrayType | RecordType | PointerType | ProcedureType
+    : Qualident { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
+    | ArrayType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
+    | RecordType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
+    | PointerType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
+    | ProcedureType{ struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
     ;
 
 ArrayType
-    : K_ARRAY LengthList K_OF Type
+    : K_ARRAY LengthList K_OF Type { struct Node** children = {$2, $4}; $$ = createNode("ArrayType", children, 2); }
     ;
 
 Length
-    : ConstExpression { printf("Inside Length\n"); }
+    : ConstExpression { struct Node** children = {$1}; $$ = createNode("Length", children, 1); }
     ;
 
 LengthList
-    : Length
-    | LengthList D_COM Length { printf("Inside LengthList\n"); }
+    : Length { struct Node** children = {$1}; $$ = createNode("LengthList", children, 1); }
+    | LengthList D_COM Length { struct Node** children = {$1, $3}; $$ = createNode("LengthList", children, 2); }
     ;
 
 RecordType
-    : K_RECORD RecordInheritance RecordFields K_END { printf("Inside RecordType\n"); }
+    : K_RECORD RecordInheritance RecordFields K_END { struct Node** children = {$2, $3}; $$ = createNode("RecordType", children, 2); }
     ;
 
 RecordInheritance
-    : D_LBR BaseType D_RBR { printf("Inside RecordInheritance\n"); }
-    | /* empty */
+    : D_LBR BaseType D_RBR { struct Node** children = {$2}; $$ = createNode("RecordInheritance", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 RecordFields
-    : FieldListSequence { printf("Inside RecordFields\n"); }
-    | /* empty */
+    : FieldListSequence { struct Node** children = {$1}; $$ = createNode("RecordFields", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 BaseType
-    : Qualident { printf("Inside BaseType\n"); }
+    : Qualident { struct Node** children = {$1}; $$ = createNode("BaseType", children, 1); }
     ;
 
 FieldListSequence
-    : FieldList { printf("Inside FieldListSequend\n"); }
-    | FieldListSequence D_SEM FieldList
+    : FieldList { struct Node** children = {$1}; $$ = createNode("FieldListSequence", children, 1); }
+    | FieldListSequence D_SEM FieldList { struct Node** children = {$1, $3}; $$ = createNode("FieldListSequence", children, 2); }
     ;
 
 FieldList
-    : IdentDefList D_COL Type { printf("Inside FieldList\n"); }
+    : IdentDefList D_COL Type { struct Node** children = {$1, $3}; $$ = createNode("FieldList", children, 2); }
     ;
 
 PointerType
-    : K_POINTER K_TO Type { printf("Inside PointerType\n"); }
+    : K_POINTER K_TO Type { struct Node** children = {$3}; $$ = createNode("PointerType", children, 1); }
     ;
 
 ProcedureType
-    : K_PROCEDURE
-    | K_PROCEDURE FormalParameters
+    : K_PROCEDURE { struct Node** children; $$ = createNode("PROCEDURE", children, 0); }
+    | K_PROCEDURE FormalParameters { struct Node** children = {$2}; $$ = createNode("ProcedureType", children, 1); }
     ;
 
 FormalParameters
-    : D_LBR FormalArguments D_RBR FormalResult { printf("Inside FormalParameters\n"); }
-    | D_LBR D_RBR FormalResult { printf("Inside FormalParameters\n"); }
+    : D_LBR FormalArguments D_RBR FormalResult { struct Node** children = {$2, $4}; $$ = createNode("FormalParameters", children, 2); }
+    | D_LBR D_RBR FormalResult { struct Node** children = {$3}; $$ = createNode("FormalParameters", children, 1); }
     ;
 
 FormalArguments
-    : FormalParametersSection { printf("Inside FormalArguments\n"); }
-    | FormalArguments D_SEM FormalParametersSection { printf("Inside FormalArguments\n"); }
+    : FormalParametersSection { struct Node** children = {$1}; $$ = createNode("FormalArguments", children, 1); }
+    | FormalArguments D_SEM FormalParametersSection { struct Node** children = {$1, $3}; $$ = createNode("FormalArguments", children, 2); }
     ;
 
 FormalResult
-    : D_COL Qualident { printf("Inside FormalResult\n"); }
-    | /* empty */
+    : D_COL Qualident { struct Node** children = {$2}; $$ = createNode("FormalResult", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 FormalParametersSection
-    : IdentList D_COL FormalType
-    | K_VAR IdentList D_COL FormalType
+    : IdentList D_COL FormalType { struct Node** children = {$1, $3}; $$ = createNode("FormalParametersSection", children, 2); }
+    | K_VAR IdentList D_COL FormalType { struct Node** children = {$2, $4}; $$ = createNode("FormalParametersSection", children, 2); }
     ;
 
 IdentList
-    : Identifier
-    | IdentList D_COM Identifier { printf("Inside IdentList\n"); }
+    : Identifier { struct Node** children = {$1}; $$ = createNode("IdentList", children, 1); }
+    | IdentList D_COM Identifier { struct Node** children = {$1, $3}; $$ = createNode("IdentList", children, 2); }
     ;
 
 FormalType
-    : FormalTypeSequence Qualident { printf("Inside FormalType\n"); }
+    : FormalTypeSequence Qualident { struct Node** children = {$1, $2}; $$ = createNode("FormalType", children, 2); }
     ;
 
 FormalTypeSequence
-    : K_ARRAY K_OF FormalTypeSequence { printf("Inside FormalTypeSequence\n"); }
-    | /* empty */
+    : K_ARRAY K_OF FormalTypeSequence { struct Node** children = {$3}; $$ = createNode("FormalTypeSequence", children, 1); }
+    | /* empty */ { $$ = NULL;}
     ;
 
 Qualident
-    : Identifier { printf("Inside Qualident\n"); }
-    | Identifier D_DOT Identifier { printf("Inside Qualident\n"); }
+    : Identifier { struct Node** children = {$1}; $$ = createNode("Qualident", children, 1); }
+    | Identifier D_DOT Identifier { struct Node** children = {$1, $3}; $$ = createNode("Qualident", children, 1); }
     ;
 
 IdentDefList
-    : IdentDef { printf("Inside IdentDefList\n"); }
-    | IdentDefList D_COM IdentDef
+    : IdentDef { struct Node** children = {$1}; $$ = createNode("IdentDefList", children, 1); }
+    | IdentDefList D_COM IdentDef { struct Node** children = {$1, $3}; $$ = createNode("IdentDefList", children, 2); }
     ;
 
 IdentDef
-    : Identifier
-    | Identifier O_MUL
+    : Identifier { struct Node** children = {$1}; $$ = createNode("IdentDef", children, 1); }
+    | Identifier O_MUL { struct Node** children = {$1}; $$ = createNode("IdentDef", children, 1); }
     ;
 
 Identifier
-    : IDENTIFIER { printf("Identifier %s\n", $1); }
-    | PREDEFINED_IDENTIFIER { printf("Pre identifier %s\n", $1); }
+    : IDENTIFIER { struct Node** children; $$ = createNode("Identifier", children, 0); }
+    | PREDEFINED_IDENTIFIER { struct Node** children; $$ = createNode("predefined", children, 0); }
     ;
 
 %%
@@ -462,7 +512,8 @@ struct Node* createNode(const char* data, struct Node** children, int len) {
 }
 
 void insertChild(struct Node* parent, struct Node* child) {
-    parent->children[parent->index++] = child;
+    if (child != NULL)
+        parent->children[parent->index++] = child;
 }
 
 int main(int argc, char** argv) {
