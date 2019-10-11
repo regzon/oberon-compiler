@@ -18,39 +18,40 @@ letter		[A-Za-z]
 
 %%
 
-[ \n\t]+						{ /* ignore */ }
-{digit}+						{ return parseInteger(yytext); }
-{hexDigit}+"H"					{ return parseHexInteger(yytext); }
-{hexDigit}+"X"					{ return parseHexString(yytext); }
+[ \n\t]+								{ /* ignore */ }
+{digit}+								{ return parseInteger(yytext); }
+{hexDigit}+"H"							{ return parseHexInteger(yytext); }
+{hexDigit}+"X"							{ return parseHexString(yytext); }
 {digit}+"."{digit}*(E[+-]?{digit}+)?	{ return parseReal(yytext); }
-{letter}({digit}|{letter})*		{ return parseIdOrKeyword(yytext); }
-\"[\"\n]*\"						{ return parseString(yytext); }
-"+"								{ return O_ADD; }
-"-"								{ return O_SUB; }
-"*"								{ return O_MUL; }
-"/"								{ return O_DIV; }
-"~"								{ return O_NOT; }
-"&"								{ return O_AND; }
-"."								{ return D_DOT; }
-","								{ return D_COM; }
-":"								{ return D_COL; }
-";"								{ return D_SEM; }
-"|"								{ return D_PIP; }
-"("								{ return D_LBR; }
-")"								{ return D_RBR; }
-"["								{ return D_LSQBR; }
-"]"								{ return D_RSQBR; }
-"{"								{ return D_LCURBR; }
-"}"								{ return D_RCURBR; }
-".."							{ return D_DDOT; }
-">"								{ return O_GT; }
-">="							{ return O_GTE; }
-"<"								{ return O_LT; }
-"<="							{ return O_LTE; }
-"#"								{ return O_NOTEQ; }
-"="								{ return O_EQ; }
-"^"								{ return O_POINT; }
-":="							{ return O_ASS; }
+{letter}({digit}|{letter})*				{ return parseIdOrKeyword(yytext); }
+\"[^\"\n]*\"							{ return parseString(yytext); }
+
+"+"		{ return O_ADD; }
+"-"		{ return O_SUB; }
+"*"		{ return O_MUL; }
+"/"		{ return O_DIV; }
+"~"		{ return O_NOT; }
+"&"		{ return O_AND; }
+"."		{ return D_DOT; }
+","		{ return D_COM; }
+":"		{ return D_COL; }
+";"		{ return D_SEM; }
+"|"		{ return D_PIP; }
+"("		{ return D_LBR; }
+")"		{ return D_RBR; }
+"["		{ return D_LSQBR; }
+"]"		{ return D_RSQBR; }
+"{"		{ return D_LCURBR; }
+"}"		{ return D_RCURBR; }
+".."	{ return D_DDOT; }
+">"		{ return O_GT; }
+">="	{ return O_GTE; }
+"<"		{ return O_LT; }
+"<="	{ return O_LTE; }
+"#"		{ return O_NOTEQ; }
+"="		{ return O_EQ; }
+"^"		{ return O_POINT; }
+":="	{ return O_ASS; }
 
 
 

@@ -49,13 +49,13 @@ ModuleDeclaration
     ;
 
 ImportList
-    : K_IMPORT ImportEntry AdditionalImportEntries D_SEM { printf("Inside ImportList\n"); }
+    : K_IMPORT ImportEntries D_SEM { printf("Inside ImportList\n"); }
     | /* empty */
     ;
 
-AdditionalImportEntries
-    : D_COM ImportEntry AdditionalImportEntries { printf("Inside AdditionalImportEntries\n"); }
-    | /* empty */
+ImportEntries
+    : ImportEntry
+    | ImportEntries D_COM ImportEntry { printf("Inside ImportEntries\n"); }
     ;
 
 ImportEntry
@@ -110,7 +110,7 @@ VarSequence
     ;
 
 VarDeclaration
-    : IdentList D_COL Type { printf("Inside VarDeclaration\n"); }
+    : IdentDefList D_COL Type { printf("Inside VarDeclaration\n"); }
     ;
 
 ProcedureSequence
@@ -142,17 +142,18 @@ ProcedureReturn
     ;
 
 StatementList
-    : Statement StatementSequence { printf("Inside StatementList\n"); }
-    ;
-
-StatementSequence
-    : D_SEM Statement StatementSequence { printf("Inside StatementSequence\n"); }
-    | /* empty */
+    : Statement { printf("Inside StatementList(solo)\n"); }
+    | StatementList D_SEM Statement { printf("Inside StatementList\n"); }
     ;
 
 Statement
-    : Assignment | ProcedureCall | IfStatement | CaseStatement
-    | WhileStatement | RepeatStatement | ForStatement
+    : Assignment { printf("Inside Statement(Assignment)\n"); }
+    | ProcedureCall { printf("Inside Statement(ProcedureCall)\n"); }
+    | IfStatement { printf("Inside Statement(IfStatement)\n"); }
+    | CaseStatement { printf("Inside Statement(CaseStatement)\n"); }
+    | WhileStatement { printf("Inside Statement(WhileStatement)\n"); }
+    | RepeatStatement { printf("Inside Statement(RepeatStatement)\n"); }
+    | ForStatement { printf("Inside Statement(ForStatement)\n"); }
     | /* empty */
     ;
 
@@ -161,8 +162,7 @@ Assignment
     ;
 
 ProcedureCall
-    : Designator { printf("Inside ProcedureCall\n"); }
-    | Designator ActualParameter
+    : Designator ActualParameter
     ;
 
 IfStatement
@@ -194,12 +194,8 @@ Case
     ;
 
 CaseLabelList
-    : LabelRange LabelRangeSequence { printf("Inside CaseLabelList\n"); }
-    ;
-
-LabelRangeSequence
-    : D_COM LabelRange LabelRangeSequence { printf("Inside LabelRangeSequence\n"); }
-    | /* empty */
+    : LabelRange { printf("Inside CaseLabelList\n"); }
+    | CaseLabelList D_COM LabelRange
     ;
 
 LabelRange
@@ -266,12 +262,8 @@ AddOperator
     ;
 
 Term
-    : Factor FactorSequence { printf("Inside Term\n"); }
-    ;
-
-FactorSequence
-    : MulOperator Factor FactorSequence { printf("Inside FactorSequence\n"); }
-    | /* empty */
+    : Factor { printf("Inside Term\n"); }
+    | Term MulOperator Factor
     ;
 
 MulOperator
@@ -280,7 +272,7 @@ MulOperator
 
 Factor
     : Number | T_STRING | K_NIL | K_TRUE | K_FALSE
-    | Set | Designator | Designator ActualParameter
+    | Set | Designator ActualParameter
     | D_LBR Expression D_RBR | O_NOT Factor
     ;
 
@@ -290,12 +282,12 @@ Number
 
 Set
     : D_LCURBR D_RCURBR
-    | D_LCURBR Element AdditionalElements D_RCURBR
+    | D_LCURBR Elements D_RCURBR
     ;
 
-AdditionalElements
-    : D_COM Element AdditionalElements { printf("Inside AdditionalElements\n"); }
-    | /* empty */
+Elements
+    : Element
+    | Elements D_COM Element { printf("Inside Elements\n"); }
     ;
 
 Element
@@ -316,21 +308,17 @@ Selector
     : D_DOT Identifier
     | D_LSQBR ExpList D_RSQBR
     | O_POINT
-    | D_LBR Qualident D_RBR { printf("Inside Selector with brackets\n"); }
     ;
 
 ActualParameter
     : D_LBR D_RBR
     | D_LBR ExpList D_RBR
+    | /* empty */
     ;
 
 ExpList
-    : Expression ExpressionSequence { printf("Inside ExpList\n"); }
-    ;
-
-ExpressionSequence
-    : D_COM Expression ExpressionSequence { printf("Inside ExpressionSequence\n"); }
-    | /* empty */
+    : Expression { printf("Inside ExpList(solo)\n"); }
+    | ExpList D_COM Expression
     ;
 
 Type
@@ -338,16 +326,16 @@ Type
     ;
 
 ArrayType
-    : K_ARRAY Length LengthSequence K_OF Type
+    : K_ARRAY LengthList K_OF Type
     ;
 
 Length
     : ConstExpression { printf("Inside Length\n"); }
     ;
 
-LengthSequence
-    : D_COM Length LengthSequence { printf("Inside LengthSequence\n"); }
-    | /* empty */
+LengthList
+    : Length
+    | LengthList D_COM Length { printf("Inside LengthList\n"); }
     ;
 
 RecordType
@@ -360,7 +348,7 @@ RecordInheritance
     ;
 
 RecordFields
-    : FieldListList { printf("Inside RecordFields\n"); }
+    : FieldListSequence { printf("Inside RecordFields\n"); }
     | /* empty */
     ;
 
@@ -368,17 +356,13 @@ BaseType
     : Qualident { printf("Inside BaseType\n"); }
     ;
 
-FieldListList
-    : FieldList FieldListSequence { printf("Inside FieldListList\n"); }
-    ;
-
 FieldListSequence
-    : D_SEM FieldList FieldListSequence { printf("Inside FieldListSequence\n"); }
-    | /* empty */
+    : FieldList { printf("Inside FieldListSequend\n"); }
+    | FieldListSequence D_SEM FieldList
     ;
 
 FieldList
-    : IdentList D_COL Type { printf("Inside FieldList\n"); }
+    : IdentDefList D_COL Type { printf("Inside FieldList\n"); }
     ;
 
 PointerType
@@ -392,16 +376,12 @@ ProcedureType
 
 FormalParameters
     : D_LBR FormalArguments D_RBR FormalResult { printf("Inside FormalParameters\n"); }
+    | D_LBR D_RBR FormalResult { printf("Inside FormalParameters\n"); }
     ;
 
 FormalArguments
-    : FormalParametersSection FormalParametersSectionSequence { printf("Inside FormalArguments\n"); }
-    | /* empty */
-    ;
-
-FormalParametersSectionSequence
-    : D_SEM FormalParametersSection FormalParametersSectionSequence { printf("Inside FormalParametersSectionSequence\n"); }
-    | /* empty */
+    : FormalParametersSection { printf("Inside FormalArguments\n"); }
+    | FormalArguments D_SEM FormalParametersSection { printf("Inside FormalArguments\n"); }
     ;
 
 FormalResult
@@ -410,13 +390,13 @@ FormalResult
     ;
 
 FormalParametersSection
-    : Identifier IdentSequence D_COL FormalType
-    | K_VAR Identifier IdentSequence D_COL FormalType
+    : IdentList D_COL FormalType
+    | K_VAR IdentList D_COL FormalType
     ;
 
-IdentSequence
-    : D_COM Identifier IdentSequence { printf("Inside IdentSequence\n"); }
-    | /* empty */
+IdentList
+    : Identifier
+    | IdentList D_COM Identifier { printf("Inside IdentList\n"); }
     ;
 
 FormalType
@@ -433,13 +413,9 @@ Qualident
     | Identifier D_DOT Identifier { printf("Inside Qualident\n"); }
     ;
 
-IdentList
-    : IdentDef AdditionIdents { printf("Inside IdentList\n"); }
-    ;
-
-AdditionIdents
-    : D_COM IdentDef AdditionIdents { printf("Inside AdditionalIdents\n"); }
-    | /* empty */
+IdentDefList
+    : IdentDef { printf("Inside IdentDefList\n"); }
+    | IdentDefList D_COM IdentDef
     ;
 
 IdentDef
@@ -454,9 +430,19 @@ Identifier
 
 %%
 
-int main() {
-    yyin = stdin;
+int main(int argc, char** argv) {
+    #ifdef YYDEBUG
+        yydebug = 0;
+    #endif
+
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s source\n", argv[0]);
+        exit(1);
+    }
+
+    yyin = fopen(argv[1], "r");
     yyparse();
+    fclose(yyin);
     return 0;
 }
 
