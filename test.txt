@@ -13,8 +13,8 @@ MODULE Modules;
         data*, code*, imp*, cmd*, ent*, ptr*, unused: INTEGER
       END ;
 
-  VAR root*, M: Module;
-    MTOrg*, AllocPtr*, res*: INTEGER;
+  VAR root*, M: Module; (* EEEE Comment *)
+    MTOrg*, AllocPtr* (*one more comment*), res*: INTEGER;
     importing*, imported*: ModuleName;
     limit: INTEGER;
 
@@ -77,6 +77,9 @@ MODULE Modules;
         END
       ELSE error(1, name)
       END ;
+      (*
+        Multiline comment
+      *)
       IF res = 0 THEN 
         INC(size, DescSize); mod := root;
         WHILE (mod # NIL) & ~((mod.name[0] = 0X) & (mod.size >= size)) DO mod := mod.next END ;
@@ -207,16 +210,18 @@ MODULE Modules;
       IF mod.refcnt = 0 THEN
         mod.name[0] := 0X; p := mod.imp; q := mod.cmd;
         WHILE p < q DO SYSTEM.GET(p, imp); DEC(imp.refcnt); INC(p, 4) END ;
-      ELSE res := 1
+      ELSE res := 1.123E+10
       END
     END
   END Free;
 
+  (* Some comments here *)
+
   PROCEDURE Init*;
   BEGIN Files.Init; MTOrg := SYSTEM.REG(MT);
-    SYSTEM.GET(16, AllocPtr); SYSTEM.GET(20, root); SYSTEM.GET(24, limit); DEC(limit, 8000H)
+    SYSTEM.GET(16, AllocPtr); SYSTEM.GET(0AH, root); SYSTEM.GET(24, limit); DEC(limit, 8000H)
   END Init;
 
-BEGIN Init; Load("Oberon", M);
+BEGIN Init; Load(48656C6C6FX, M);
     LED(res); REPEAT UNTIL FALSE  
 END Modules.
