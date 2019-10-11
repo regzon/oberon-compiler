@@ -12,6 +12,8 @@
     int parseString(char*);
 %}
 
+%x C_COMMENT
+
 digit		[0-9]
 hexDigit	[0-9A-F]
 letter		[A-Za-z]
@@ -20,11 +22,16 @@ letter		[A-Za-z]
 
 [ \n\t]+								{ /* ignore */ }
 {digit}+								{ return parseInteger(yytext); }
-{hexDigit}+"H"							{ return parseHexInteger(yytext); }
-{hexDigit}+"X"							{ return parseHexString(yytext); }
+{digit}{hexDigit}*"H"					{ return parseHexInteger(yytext); }
+{digit}{hexDigit}*"X"					{ return parseHexString(yytext); }
 {digit}+"."{digit}*(E[+-]?{digit}+)?	{ return parseReal(yytext); }
 {letter}({digit}|{letter})*				{ return parseIdOrKeyword(yytext); }
 \"[^\"\n]*\"							{ return parseString(yytext); }
+
+"(*"			{ BEGIN(C_COMMENT); }
+<C_COMMENT>.	{ }
+<C_COMMENT>\n	{ }
+<C_COMMENT>"*)"	{ BEGIN(INITIAL); }
 
 "+"		{ return O_ADD; }
 "-"		{ return O_SUB; }
@@ -52,8 +59,6 @@ letter		[A-Za-z]
 "="		{ return O_EQ; }
 "^"		{ return O_POINT; }
 ":="	{ return O_ASS; }
-
-
 
 %%
 
@@ -128,22 +133,71 @@ int parseIdOrKeyword(char* parsed_string) {
     return IDENTIFIER;
 }
 
-int parseInteger(char* s) {
+int parseInteger(char* input) {
+    long result = strtol(input, NULL, 10);
+    printf("Parsed integer %d\n", result);
     return T_INTEGER;
 }
 
-int parseHexInteger(char* s) {
+int parseHexInteger(char* input) {
+    int input_len = strlen(input);
+    // Remove character 'H'
+    input[input_len - 1] = '\0';
+    long result = strtol(input, NULL, 16);
+    printf("Parsed hex integer: %d\n", result);
     return T_INTEGER;
 }
 
-int parseHexString(char* s) {
+int parseHexString(char* input) {
+    int input_len = strlen(input);
+    // Remove character 'X'
+    input[input_len - 1] = '\0';
+    input_len--;
+
+    int index = 0;
+    char last_sym = '\0';;
+    char decoder[3] = {0, 0, 0};
+
+    int result_index = 0;
+    char* result = (char*)malloc(((input_len + 1) / 2 + 1) * sizeof(char));
+
+    if (input_len & 1)
+        last_sym = '0';
+
+    while (index < input_len) {
+        if (last_sym == '\0') {
+            last_sym = input[index];
+        }
+        else {
+            decoder[0] = last_sym;
+            decoder[1] = input[index];
+            result[result_index++] = (char)strtol(decoder, NULL, 16);
+            last_sym = '\0';
+        }
+        index++;
+    }
+
+    result[result_index] = '\0';
+    printf("Parsed hex string: %s\n", result);
+
     return T_STRING;
 }
 
-int parseReal(char* s) {
+int parseReal(char* input) {
+    float result = strtof(input, NULL);
+    printf("Parsed real %f\n", result);
     return T_REAL;
 }
 
-int parseString(char* s) {
+int parseString(char* input) {
+    int input_len = strlen(input);
+    input[input_len - 1] = '\0';
+
+    char* result = (char*)malloc((input_len - 1) * sizeof(char));
+    strcpy(result, input + 1);
+
+    result[input_len - 2] = '\0';
+    printf("Parsed string: %s\n", result);
+
     return T_STRING;
 }
