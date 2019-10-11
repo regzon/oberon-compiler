@@ -1,16 +1,29 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string.h>
 
     extern int yylex();
     extern int yyparse();
     extern FILE* yyin;
 
     void yyerror(const char* s);
+
+    struct Node {
+        char* data;
+        int index;
+        struct Node** children;
+    };
+
+    struct Node* createNode(const char* data, struct Node** children, int len);
+    void insertChild(struct Node* parent, struct Node* child);
+
+    struct Node* root;
 %}
 
 %union {
     char* string;
+    struct Node* node;
 }
 
 %token <string> IDENTIFIER
@@ -27,16 +40,18 @@
 %token D_PIP D_LBR D_RBR D_LSQBR D_RSQBR D_LCURBR D_RCURBR D_DDOT O_GT
 %token O_GTE O_LT O_LTE O_NOTEQ O_EQ O_POINT O_ASS   
 
+%type <node> CompilationUnit
+
 %start CompilationUnit
 
 %%
 
 CompilationUnit
-    : ModuleList { printf("Inside CompilationUnit\n"); }
+    : ModuleList { struct Node** children; root = createNode("root", children, 0); }
     ;
     
 ModuleList
-    : Module ModuleList { printf("Inside ModuleList\n"); }
+    : Module ModuleList { }
     | /* empty */
     ;
     
@@ -430,6 +445,26 @@ Identifier
 
 %%
 
+struct Node* createNode(const char* data, struct Node** children, int len) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+
+    newNode->data = (char*)malloc((strlen(data) + 1) * sizeof(char));
+    strcpy(newNode->data, data);
+
+    newNode->index = 0;
+
+    newNode->children = (struct Node**)malloc(len * sizeof(struct Node*));
+    for (int i = 0; i < len; i++) {
+        insertChild(newNode, children[i]);
+    }
+
+    return newNode;
+}
+
+void insertChild(struct Node* parent, struct Node* child) {
+    parent->children[parent->index++] = child;
+}
+
 int main(int argc, char** argv) {
     #ifdef YYDEBUG
         yydebug = 0;
@@ -441,7 +476,10 @@ int main(int argc, char** argv) {
     }
 
     yyin = fopen(argv[1], "r");
+
     yyparse();
+    printf("Root children number %d\n", root->index);
+
     fclose(yyin);
     return 0;
 }
