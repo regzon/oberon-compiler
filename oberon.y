@@ -61,222 +61,222 @@
 %%
 
 CompilationUnit
-    : ModuleList { struct Node** children = {$1}; root = createNode("root", children, 1); }
+    : ModuleList { struct Node* children[] = {$1}; root = createNode("root", children, 1); }
     ;
     
 ModuleList
-    : Module ModuleList {struct Node** children = {$1, $2}; $$ = createNode("ModuleList", children, 2); }
+    : Module ModuleList {struct Node* children[] = {$1, $2}; $$ = createNode("ModuleList", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
     
 Module
-    : K_MODULE Identifier D_SEM ModuleDeclaration { struct Node** children = {$2, $4}; $$ = createNode("Module", children, 2);  }
+    : K_MODULE Identifier D_SEM ModuleDeclaration { struct Node* children[] = {$2, $4}; $$ = createNode("Module", children, 2);  }
     ;
 
 ModuleDeclaration
-    : ImportList DeclarationSequence ModuleBody K_END Identifier D_DOT { struct Node** children = {$1, $2, $3, $5};
+    : ImportList DeclarationSequence ModuleBody K_END Identifier D_DOT { struct Node* children[] = {$1, $2, $3, $5};
                                                                          $$ = createNode("ModuleDeclaration", children, 4); }
     ;
 
 ImportList
-    : K_IMPORT ImportEntries D_SEM { struct Node** children = {$2}; $$ = createNode("ImportList", children, 1); }
+    : K_IMPORT ImportEntries D_SEM { struct Node* children[] = {$2}; $$ = createNode("ImportList", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ImportEntries
-    : ImportEntry {struct Node** children = {$1}; $$ = createNode("ImportList", children, 1);}
-    | ImportEntries D_COM ImportEntry { struct Node** children = {$1, $3}; $$ = createNode("ImportList", children, 2); }
+    : ImportEntry {struct Node* children[] = {$1}; $$ = createNode("ImportList", children, 1);}
+    | ImportEntries D_COM ImportEntry { struct Node* children[] = {$1, $3}; $$ = createNode("ImportList", children, 2); }
     ;
 
 ImportEntry
-    : Identifier { struct Node** children = {$1}; $$ = createNode("ImportEntry", children, 1); }
+    : Identifier { struct Node* children[] = {$1}; $$ = createNode("ImportEntry", children, 1); }
     | Identifier O_ASS Identifier
     ;
 
 DeclarationSequence
-    : ConstBlock TypeBlock VarBlock ProcedureSequence { struct Node** children = {$1, $2, $3, $4}; 
+    : ConstBlock TypeBlock VarBlock ProcedureSequence { struct Node* children[] = {$1, $2, $3, $4}; 
                                         $$ = createNode("DeclarationSequence", children, 4); }
     ;
 
 ConstBlock
-    : K_CONST ConstSequence { struct Node** children = {$2}; $$ = createNode("ConstBlock", children, 1); }
+    : K_CONST ConstSequence { struct Node* children[] = {$2}; $$ = createNode("ConstBlock", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ConstSequence
-    : ConstDeclaration D_SEM ConstSequence { struct Node** children = {$1, $3}; $$ = createNode("ConstSequence", children, 2); }
+    : ConstDeclaration D_SEM ConstSequence { struct Node* children[] = {$1, $3}; $$ = createNode("ConstSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ConstDeclaration
-    : Identifier O_EQ ConstExpression { struct Node** children = {$1, $3}; $$ = createNode("ConstDeclaration", children, 2); }
+    : Identifier O_EQ ConstExpression { struct Node* children[] = {$1, $3}; $$ = createNode("ConstDeclaration", children, 2); }
     ;
 
 ConstExpression
-    : Expression { struct Node** children = {$1}; $$ = createNode("ConstExpression", children, 1); }
+    : Expression { struct Node* children[] = {$1}; $$ = createNode("ConstExpression", children, 1); }
     ;
 
 TypeBlock
-    : K_TYPE TypeSequence { struct Node** children = {$2}; $$ = createNode("TypeBlock", children, 1); }
+    : K_TYPE TypeSequence { struct Node* children[] = {$2}; $$ = createNode("TypeBlock", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 TypeSequence
-    : TypeDeclaration D_SEM TypeSequence { struct Node** children = {$1, $3}; $$ = createNode("TypeSequence", children, 2); }
+    : TypeDeclaration D_SEM TypeSequence { struct Node* children[] = {$1, $3}; $$ = createNode("TypeSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 TypeDeclaration
-    : IdentDef O_EQ Type { struct Node** children = {$1, $3}; $$ = createNode("TypeDeclaration", children, 2); }
+    : IdentDef O_EQ Type { struct Node* children[] = {$1, $3}; $$ = createNode("TypeDeclaration", children, 2); }
     ;
 
 VarBlock
-    : K_VAR VarSequence { struct Node** children = {$2}; $$ = createNode("VarBlock", children, 1); }
+    : K_VAR VarSequence { struct Node* children[] = {$2}; $$ = createNode("VarBlock", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 VarSequence
-    : VarDeclaration D_SEM VarSequence { struct Node** children = {$1, $3}; $$ = createNode("VarSequence", children, 2); }
+    : VarDeclaration D_SEM VarSequence { struct Node* children[] = {$1, $3}; $$ = createNode("VarSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 VarDeclaration
-    : IdentDefList D_COL Type { struct Node** children = {$1, $3}; $$ = createNode("VarDeclaration", children, 2); }
+    : IdentDefList D_COL Type { struct Node* children[] = {$1, $3}; $$ = createNode("VarDeclaration", children, 2); }
     ;
 
 ProcedureSequence
-    : ProcedureDeclaration D_SEM ProcedureSequence { struct Node** children = {$1, $3}; $$ = createNode("ProcedureSequence", children, 2); }
+    : ProcedureDeclaration D_SEM ProcedureSequence { struct Node* children[] = {$1, $3}; $$ = createNode("ProcedureSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ProcedureDeclaration
-    : ProcedureHeading D_SEM ProcedureBody Identifier { struct Node** children = {$1, $3, $4};
+    : ProcedureHeading D_SEM ProcedureBody Identifier { struct Node* children[] = {$1, $3, $4};
                                              $$ = createNode("ProcedureDeclaration", children, 3); }
     ;
 
 ProcedureHeading
-    : K_PROCEDURE IdentDef { struct Node** children = {$2}; $$ = createNode("ProcedureHeading", children, 1); }
-    | K_PROCEDURE IdentDef FormalParameters { struct Node** children = {$2, $3}; $$ = createNode("ProcedureDeclaration", children, 2); }
+    : K_PROCEDURE IdentDef { struct Node* children[] = {$2}; $$ = createNode("ProcedureHeading", children, 1); }
+    | K_PROCEDURE IdentDef FormalParameters { struct Node* children[] = {$2, $3}; $$ = createNode("ProcedureDeclaration", children, 2); }
     ;
 
 ProcedureBody
-    : DeclarationSequence ProcedureBegin ProcedureReturn K_END { struct Node** children = {$1, $2, $3}; 
+    : DeclarationSequence ProcedureBegin ProcedureReturn K_END { struct Node* children[] = {$1, $2, $3}; 
                                         $$ = createNode("ProcedureBody", children, 3); }
     ;
 
 ProcedureBegin
-    : K_BEGIN StatementList { struct Node** children = {$2}; $$ = createNode("ProcedureBegin", children, 1); }
+    : K_BEGIN StatementList { struct Node* children[] = {$2}; $$ = createNode("ProcedureBegin", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ProcedureReturn
-    : K_RETURN Expression { struct Node** children = {$2}; $$ = createNode("ProcedureReturn", children, 1); }
+    : K_RETURN Expression { struct Node* children[] = {$2}; $$ = createNode("ProcedureReturn", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 StatementList
-    : Statement { struct Node** children = {$1}; $$ = createNode("StatementList", children, 1); }
-    | StatementList D_SEM Statement { struct Node** children = {$1, $3}; $$ = createNode("StatementList", children, 2); }
+    : Statement { struct Node* children[] = {$1}; $$ = createNode("StatementList", children, 1); }
+    | StatementList D_SEM Statement { struct Node* children[] = {$1, $3}; $$ = createNode("StatementList", children, 2); }
     ;
 
 Statement
-    : Assignment { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | ProcedureCall { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | IfStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | CaseStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | WhileStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | RepeatStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
-    | ForStatement { struct Node** children = {$1}; $$ = createNode("Statement", children, 1); }
+    : Assignment { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | ProcedureCall { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | IfStatement { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | CaseStatement { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | WhileStatement { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | RepeatStatement { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
+    | ForStatement { struct Node* children[] = {$1}; $$ = createNode("Statement", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 Assignment
-    : Designator O_ASS Expression { struct Node** children = {$1, $3}; $$ = createNode("Assignment", children, 2); }
+    : Designator O_ASS Expression { struct Node* children[] = {$1, $3}; $$ = createNode("Assignment", children, 2); }
     ;
 
 ProcedureCall
-    : Designator ActualParameter { struct Node** children = {$1, $2}; $$ = createNode("ProcedureCall", children, 2); }
+    : Designator ActualParameter { struct Node* children[] = {$1, $2}; $$ = createNode("ProcedureCall", children, 2); }
     ;
 
 IfStatement
-    : K_IF Expression K_THEN StatementList ElseIfSequence ElseStatement K_END { struct Node** children = {$2, $4, $5, $6}; 
+    : K_IF Expression K_THEN StatementList ElseIfSequence ElseStatement K_END { struct Node* children[] = {$2, $4, $5, $6}; 
                                                                     $$ = createNode("IfStatement", children, 4); }
     ;
 
 ElseIfSequence
-    : K_ELSIF Expression K_THEN StatementList ElseIfSequence { struct Node** children = {$2, $4, $5}; 
+    : K_ELSIF Expression K_THEN StatementList ElseIfSequence { struct Node* children[] = {$2, $4, $5}; 
                                                                 $$ = createNode("ElseIfSequence", children, 3); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ElseStatement
-    : K_ELSE StatementList { struct Node** children = {$2}; $$ = createNode("ElseStatement", children, 1); }
+    : K_ELSE StatementList { struct Node* children[] = {$2}; $$ = createNode("ElseStatement", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 CaseStatement
-    : K_CASE Expression K_OF Case CaseSequence K_END { struct Node** children = {$2, $4, $5}; $$ = createNode("CaseStatement", children, 3); }
+    : K_CASE Expression K_OF Case CaseSequence K_END { struct Node* children[] = {$2, $4, $5}; $$ = createNode("CaseStatement", children, 3); }
     ;
 
 CaseSequence
-    : D_PIP Case CaseSequence { struct Node** children = {$2, $3}; $$ = createNode("CaseSequence", children, 2); }
+    : D_PIP Case CaseSequence { struct Node* children[] = {$2, $3}; $$ = createNode("CaseSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 Case
-    : CaseLabelList D_COL StatementList { struct Node** children = {$1, $3}; $$ = createNode("Case", children, 2); }
+    : CaseLabelList D_COL StatementList { struct Node* children[] = {$1, $3}; $$ = createNode("Case", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 CaseLabelList
-    : LabelRange { struct Node** children = {$1}; $$ = createNode("CaseLabelList", children, 1); }
-    | CaseLabelList D_COM LabelRange { struct Node** children = {$1, $3}; $$ = createNode("CaseLabelList", children, 2); }
+    : LabelRange { struct Node* children[] = {$1}; $$ = createNode("CaseLabelList", children, 1); }
+    | CaseLabelList D_COM LabelRange { struct Node* children[] = {$1, $3}; $$ = createNode("CaseLabelList", children, 2); }
     ;
 
 LabelRange
-    : Label { struct Node** children = {$1}; $$ = createNode("LabelRange", children, 1); }
-    | Label D_DDOT Label { struct Node** children = {$1, $3}; $$ = createNode("LabelRange", children, 2); }
+    : Label { struct Node* children[] = {$1}; $$ = createNode("LabelRange", children, 1); }
+    | Label D_DDOT Label { struct Node* children[] = {$1, $3}; $$ = createNode("LabelRange", children, 2); }
     ;
 
 Label
     : T_INTEGER  { struct Node** children; $$ = createNode("INTEGER", children, 0); }
     | T_STRING { struct Node** children; $$ = createNode("STRING", children, 0); }
-    | Qualident { struct Node** children = {$1}; $$ = createNode("Label", children, 1); }
+    | Qualident { struct Node* children[] = {$1}; $$ = createNode("Label", children, 1); }
     ;
 
 WhileStatement
-    : K_WHILE Expression K_DO StatementList WhileElseifStatement K_END { struct Node** children = {$2, $4, $5}; 
+    : K_WHILE Expression K_DO StatementList WhileElseifStatement K_END { struct Node* children[] = {$2, $4, $5}; 
                                                                         $$ = createNode("WhileStatement", children, 3); }
     ;
 
 WhileElseifStatement
-    : K_ELSIF Expression K_DO StatementList WhileElseifStatement { struct Node** children = {$2, $4, $5}; 
+    : K_ELSIF Expression K_DO StatementList WhileElseifStatement { struct Node* children[] = {$2, $4, $5}; 
                                                                     $$ = createNode("WhileElseifStatement", children, 3); }
     | /* empty */ { $$ = NULL;}
     ;
 
 RepeatStatement
-    : K_REPEAT StatementList K_UNTIL Expression { struct Node** children = {$2, $4}; $$ = createNode("RepeatStatement", children, 2); }
+    : K_REPEAT StatementList K_UNTIL Expression { struct Node* children[] = {$2, $4}; $$ = createNode("RepeatStatement", children, 2); }
     ;
 
 ForStatement
-    : K_FOR Identifier O_ASS Expression K_TO Expression ByStatement K_DO StatementList K_END { struct Node** children = {$2, $4, $6, $7, $9}; 
+    : K_FOR Identifier O_ASS Expression K_TO Expression ByStatement K_DO StatementList K_END { struct Node* children[] = {$2, $4, $6, $7, $9}; 
                                                                                     $$ = createNode("ForStatement", children, 5); }
     ;
 
 ByStatement
-    : K_BY ConstExpression { struct Node** children = {$2}; $$ = createNode("ByStatement", children, 1); }
+    : K_BY ConstExpression { struct Node* children[] = {$2}; $$ = createNode("ByStatement", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ModuleBody
-    : K_BEGIN StatementList { struct Node** children = {$2}; $$ = createNode("ModuleBody", children, 1); }
+    : K_BEGIN StatementList { struct Node* children[] = {$2}; $$ = createNode("ModuleBody", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 Expression
-    : SimpleExpression {struct Node** children = {$1}; $$ = createNode("Expression", children, 1);}
-    | SimpleExpression Relation SimpleExpression {struct Node** children = {$1, $2, $3}; $$ = createNode("Expression", children, 3);}
+    : SimpleExpression {struct Node* children[] = {$1}; $$ = createNode("Expression", children, 1);}
+    | SimpleExpression Relation SimpleExpression {struct Node* children[] = {$1, $2, $3}; $$ = createNode("Expression", children, 3);}
     ;
 
 Relation
@@ -291,7 +291,7 @@ Relation
     ;
 
 SimpleExpression
-    : PlusMinus Term AddSequence { struct Node** children = {$1, $2, $3}; $$ = createNode("SimpleExpression", children, 3); }
+    : PlusMinus Term AddSequence { struct Node* children[] = {$1, $2, $3}; $$ = createNode("SimpleExpression", children, 3); }
     ;
 
 PlusMinus
@@ -301,7 +301,7 @@ PlusMinus
     ;
 
 AddSequence
-    : AddOperator Term AddSequence { struct Node** children = {$1, $2, $3}; $$ = createNode("AddSequence", children, 3); }
+    : AddOperator Term AddSequence { struct Node* children[] = {$1, $2, $3}; $$ = createNode("AddSequence", children, 3); }
     | /* empty */ { $$ = NULL;}
     ;
 
@@ -312,8 +312,8 @@ AddOperator
     ;
 
 Term
-    : Factor { struct Node** children = {$1}; $$ = createNode("Term", children, 1); }
-    | Term MulOperator Factor { struct Node** children = {$1, $2, $3}; $$ = createNode("Term", children, 3); }
+    : Factor { struct Node* children[] = {$1}; $$ = createNode("Term", children, 1); }
+    | Term MulOperator Factor { struct Node* children[] = {$1, $2, $3}; $$ = createNode("Term", children, 3); }
     ;
 
 MulOperator
@@ -325,15 +325,15 @@ MulOperator
     ;
 
 Factor
-    : Number { struct Node** children = {$1}; $$ = createNode("Factor", children, 1); }
+    : Number { struct Node* children[] = {$1}; $$ = createNode("Factor", children, 1); }
     | T_STRING { struct Node** children; $$ = createNode("String", children, 0); }
     | K_NIL { struct Node** children; $$ = createNode("NIL", children, 0); }
     | K_TRUE { struct Node** children; $$ = createNode("TRUE", children, 0); }
     | K_FALSE { struct Node** children; $$ = createNode("FALSE", children, 0); }
-    | Set { struct Node** children = {$1}; $$ = createNode("Factor", children, 1); }
-    | Designator ActualParameter { struct Node** children = {$1, $2}; $$ = createNode("Factor", children, 2); }
-    | D_LBR Expression D_RBR  { struct Node** children = {$2}; $$ = createNode("Factor", children, 1); }
-    | O_NOT Factor { struct Node** children = {$2}; $$ = createNode("Factor", children, 1); }
+    | Set { struct Node* children[] = {$1}; $$ = createNode("Factor", children, 1); }
+    | Designator ActualParameter { struct Node* children[] = {$1, $2}; $$ = createNode("Factor", children, 2); }
+    | D_LBR Expression D_RBR  { struct Node* children[] = {$2}; $$ = createNode("Factor", children, 1); }
+    | O_NOT Factor { struct Node* children[] = {$2}; $$ = createNode("Factor", children, 1); }
     ;
 
 Number
@@ -343,149 +343,149 @@ Number
 
 Set
     : D_LCURBR D_RCURBR { struct Node** children; $$ = createNode("CURVE BR", children, 0); }
-    | D_LCURBR Elements D_RCURBR {{ struct Node** children = {$2}; $$ = createNode("Set", children, 1); }}
+    | D_LCURBR Elements D_RCURBR {{ struct Node* children[] = {$2}; $$ = createNode("Set", children, 1); }}
     ;
 
 Elements
-    : Element { struct Node** children = {$1}; $$ = createNode("Elements", children, 1); }
-    | Elements D_COM Element { struct Node** children = {$1, $3}; $$ = createNode("Elements", children, 2); }
+    : Element { struct Node* children[] = {$1}; $$ = createNode("Elements", children, 1); }
+    | Elements D_COM Element { struct Node* children[] = {$1, $3}; $$ = createNode("Elements", children, 2); }
     ;
 
 Element
-    : Expression { struct Node** children = {$1}; $$ = createNode("Element", children, 1); }
-    | Expression D_DDOT Expression { struct Node** children = {$1, $3}; $$ = createNode("Element", children, 2); }
+    : Expression { struct Node* children[] = {$1}; $$ = createNode("Element", children, 1); }
+    | Expression D_DDOT Expression { struct Node* children[] = {$1, $3}; $$ = createNode("Element", children, 2); }
     ;
 
 Designator
-    : Qualident SelectorSequence { struct Node** children = {$1, $2}; $$ = createNode("Designator", children, 2); }
+    : Qualident SelectorSequence { struct Node* children[] = {$1, $2}; $$ = createNode("Designator", children, 2); }
     ;
 
 SelectorSequence
-    : Selector SelectorSequence { struct Node** children = {$1, $2}; $$ = createNode("SelectorSequence", children, 2); }
+    : Selector SelectorSequence { struct Node* children[] = {$1, $2}; $$ = createNode("SelectorSequence", children, 2); }
     | /* empty */ { $$ = NULL;}
     ;
 
 Selector
-    : D_DOT Identifier { struct Node** children = {$2}; $$ = createNode("Selector", children, 1); }
-    | D_LSQBR ExpList D_RSQBR { struct Node** children = {$2}; $$ = createNode("Selector", children, 1); }
+    : D_DOT Identifier { struct Node* children[] = {$2}; $$ = createNode("Selector", children, 1); }
+    | D_LSQBR ExpList D_RSQBR { struct Node* children[] = {$2}; $$ = createNode("Selector", children, 1); }
     | O_POINT { struct Node** children; $$ = createNode("POINTER", children, 0); }
     ;
 
 ActualParameter
     : D_LBR D_RBR { struct Node** children; $$ = createNode("NOT PARAM", children, 0); }
-    | D_LBR ExpList D_RBR { struct Node** children = {$2}; $$ = createNode("ActualParameter", children, 1); }
+    | D_LBR ExpList D_RBR { struct Node* children[] = {$2}; $$ = createNode("ActualParameter", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 ExpList
-    : Expression { struct Node** children = {$1}; $$ = createNode("ExpList", children, 1); }
-    | ExpList D_COM Expression { struct Node** children = {$1, $3}; $$ = createNode("ExpList", children, 2); }
+    : Expression { struct Node* children[] = {$1}; $$ = createNode("ExpList", children, 1); }
+    | ExpList D_COM Expression { struct Node* children[] = {$1, $3}; $$ = createNode("ExpList", children, 2); }
     ;
 
 Type
-    : Qualident { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
-    | ArrayType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
-    | RecordType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
-    | PointerType { struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
-    | ProcedureType{ struct Node** children = {$1}; $$ = createNode("Type", children, 1); }
+    : Qualident { struct Node* children[] = {$1}; $$ = createNode("Type", children, 1); }
+    | ArrayType { struct Node* children[] = {$1}; $$ = createNode("Type", children, 1); }
+    | RecordType { struct Node* children[] = {$1}; $$ = createNode("Type", children, 1); }
+    | PointerType { struct Node* children[] = {$1}; $$ = createNode("Type", children, 1); }
+    | ProcedureType{ struct Node* children[] = {$1}; $$ = createNode("Type", children, 1); }
     ;
 
 ArrayType
-    : K_ARRAY LengthList K_OF Type { struct Node** children = {$2, $4}; $$ = createNode("ArrayType", children, 2); }
+    : K_ARRAY LengthList K_OF Type { struct Node* children[] = {$2, $4}; $$ = createNode("ArrayType", children, 2); }
     ;
 
 Length
-    : ConstExpression { struct Node** children = {$1}; $$ = createNode("Length", children, 1); }
+    : ConstExpression { struct Node* children[] = {$1}; $$ = createNode("Length", children, 1); }
     ;
 
 LengthList
-    : Length { struct Node** children = {$1}; $$ = createNode("LengthList", children, 1); }
-    | LengthList D_COM Length { struct Node** children = {$1, $3}; $$ = createNode("LengthList", children, 2); }
+    : Length { struct Node* children[] = {$1}; $$ = createNode("LengthList", children, 1); }
+    | LengthList D_COM Length { struct Node* children[] = {$1, $3}; $$ = createNode("LengthList", children, 2); }
     ;
 
 RecordType
-    : K_RECORD RecordInheritance RecordFields K_END { struct Node** children = {$2, $3}; $$ = createNode("RecordType", children, 2); }
+    : K_RECORD RecordInheritance RecordFields K_END { struct Node* children[] = {$2, $3}; $$ = createNode("RecordType", children, 2); }
     ;
 
 RecordInheritance
-    : D_LBR BaseType D_RBR { struct Node** children = {$2}; $$ = createNode("RecordInheritance", children, 1); }
+    : D_LBR BaseType D_RBR { struct Node* children[] = {$2}; $$ = createNode("RecordInheritance", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 RecordFields
-    : FieldListSequence { struct Node** children = {$1}; $$ = createNode("RecordFields", children, 1); }
+    : FieldListSequence { struct Node* children[] = {$1}; $$ = createNode("RecordFields", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 BaseType
-    : Qualident { struct Node** children = {$1}; $$ = createNode("BaseType", children, 1); }
+    : Qualident { struct Node* children[] = {$1}; $$ = createNode("BaseType", children, 1); }
     ;
 
 FieldListSequence
-    : FieldList { struct Node** children = {$1}; $$ = createNode("FieldListSequence", children, 1); }
-    | FieldListSequence D_SEM FieldList { struct Node** children = {$1, $3}; $$ = createNode("FieldListSequence", children, 2); }
+    : FieldList { struct Node* children[] = {$1}; $$ = createNode("FieldListSequence", children, 1); }
+    | FieldListSequence D_SEM FieldList { struct Node* children[] = {$1, $3}; $$ = createNode("FieldListSequence", children, 2); }
     ;
 
 FieldList
-    : IdentDefList D_COL Type { struct Node** children = {$1, $3}; $$ = createNode("FieldList", children, 2); }
+    : IdentDefList D_COL Type { struct Node* children[] = {$1, $3}; $$ = createNode("FieldList", children, 2); }
     ;
 
 PointerType
-    : K_POINTER K_TO Type { struct Node** children = {$3}; $$ = createNode("PointerType", children, 1); }
+    : K_POINTER K_TO Type { struct Node* children[] = {$3}; $$ = createNode("PointerType", children, 1); }
     ;
 
 ProcedureType
     : K_PROCEDURE { struct Node** children; $$ = createNode("PROCEDURE", children, 0); }
-    | K_PROCEDURE FormalParameters { struct Node** children = {$2}; $$ = createNode("ProcedureType", children, 1); }
+    | K_PROCEDURE FormalParameters { struct Node* children[] = {$2}; $$ = createNode("ProcedureType", children, 1); }
     ;
 
 FormalParameters
-    : D_LBR FormalArguments D_RBR FormalResult { struct Node** children = {$2, $4}; $$ = createNode("FormalParameters", children, 2); }
-    | D_LBR D_RBR FormalResult { struct Node** children = {$3}; $$ = createNode("FormalParameters", children, 1); }
+    : D_LBR FormalArguments D_RBR FormalResult { struct Node* children[] = {$2, $4}; $$ = createNode("FormalParameters", children, 2); }
+    | D_LBR D_RBR FormalResult { struct Node* children[] = {$3}; $$ = createNode("FormalParameters", children, 1); }
     ;
 
 FormalArguments
-    : FormalParametersSection { struct Node** children = {$1}; $$ = createNode("FormalArguments", children, 1); }
-    | FormalArguments D_SEM FormalParametersSection { struct Node** children = {$1, $3}; $$ = createNode("FormalArguments", children, 2); }
+    : FormalParametersSection { struct Node* children[] = {$1}; $$ = createNode("FormalArguments", children, 1); }
+    | FormalArguments D_SEM FormalParametersSection { struct Node* children[] = {$1, $3}; $$ = createNode("FormalArguments", children, 2); }
     ;
 
 FormalResult
-    : D_COL Qualident { struct Node** children = {$2}; $$ = createNode("FormalResult", children, 1); }
+    : D_COL Qualident { struct Node* children[] = {$2}; $$ = createNode("FormalResult", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 FormalParametersSection
-    : IdentList D_COL FormalType { struct Node** children = {$1, $3}; $$ = createNode("FormalParametersSection", children, 2); }
-    | K_VAR IdentList D_COL FormalType { struct Node** children = {$2, $4}; $$ = createNode("FormalParametersSection", children, 2); }
+    : IdentList D_COL FormalType { struct Node* children[] = {$1, $3}; $$ = createNode("FormalParametersSection", children, 2); }
+    | K_VAR IdentList D_COL FormalType { struct Node* children[] = {$2, $4}; $$ = createNode("FormalParametersSection", children, 2); }
     ;
 
 IdentList
-    : Identifier { struct Node** children = {$1}; $$ = createNode("IdentList", children, 1); }
-    | IdentList D_COM Identifier { struct Node** children = {$1, $3}; $$ = createNode("IdentList", children, 2); }
+    : Identifier { struct Node* children[] = {$1}; $$ = createNode("IdentList", children, 1); }
+    | IdentList D_COM Identifier { struct Node* children[] = {$1, $3}; $$ = createNode("IdentList", children, 2); }
     ;
 
 FormalType
-    : FormalTypeSequence Qualident { struct Node** children = {$1, $2}; $$ = createNode("FormalType", children, 2); }
+    : FormalTypeSequence Qualident { struct Node* children[] = {$1, $2}; $$ = createNode("FormalType", children, 2); }
     ;
 
 FormalTypeSequence
-    : K_ARRAY K_OF FormalTypeSequence { struct Node** children = {$3}; $$ = createNode("FormalTypeSequence", children, 1); }
+    : K_ARRAY K_OF FormalTypeSequence { struct Node* children[] = {$3}; $$ = createNode("FormalTypeSequence", children, 1); }
     | /* empty */ { $$ = NULL;}
     ;
 
 Qualident
-    : Identifier { struct Node** children = {$1}; $$ = createNode("Qualident", children, 1); }
-    | Identifier D_DOT Identifier { struct Node** children = {$1, $3}; $$ = createNode("Qualident", children, 1); }
+    : Identifier { struct Node* children[] = {$1}; $$ = createNode("Qualident", children, 1); }
+    | Identifier D_DOT Identifier { struct Node* children[] = {$1, $3}; $$ = createNode("Qualident", children, 1); }
     ;
 
 IdentDefList
-    : IdentDef { struct Node** children = {$1}; $$ = createNode("IdentDefList", children, 1); }
-    | IdentDefList D_COM IdentDef { struct Node** children = {$1, $3}; $$ = createNode("IdentDefList", children, 2); }
+    : IdentDef { struct Node* children[] = {$1}; $$ = createNode("IdentDefList", children, 1); }
+    | IdentDefList D_COM IdentDef { struct Node* children[] = {$1, $3}; $$ = createNode("IdentDefList", children, 2); }
     ;
 
 IdentDef
-    : Identifier { struct Node** children = {$1}; $$ = createNode("IdentDef", children, 1); }
-    | Identifier O_MUL { struct Node** children = {$1}; $$ = createNode("IdentDef", children, 1); }
+    : Identifier { struct Node* children[] = {$1}; $$ = createNode("IdentDef", children, 1); }
+    | Identifier O_MUL { struct Node* children[] = {$1}; $$ = createNode("IdentDef", children, 1); }
     ;
 
 Identifier
@@ -516,22 +516,25 @@ void insertChild(struct Node* parent, struct Node* child) {
         parent->children[parent->index++] = child;
 }
 
+void printTree(struct Node* node) {
+    printf("Node: %s\n", node->data);
+
+    for (int i = 0; i < node->index; i++) {
+        printTree(node->children[i]);
+    }
+}
+
 int main(int argc, char** argv) {
     #ifdef YYDEBUG
         yydebug = 0;
     #endif
 
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s source\n", argv[0]);
-        exit(1);
-    }
-
-    yyin = fopen(argv[1], "r");
-
+    yyin = fopen("Test.Mod", "r");
     yyparse();
-    printf("Root children number %d\n", root->index);
-
     fclose(yyin);
+
+    printTree(root);
+
     return 0;
 }
 

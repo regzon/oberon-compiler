@@ -135,7 +135,6 @@ int parseIdOrKeyword(char* parsed_string) {
 
 int parseInteger(char* input) {
     long result = strtol(input, NULL, 10);
-    printf("Parsed integer %d\n", result);
     return T_INTEGER;
 }
 
@@ -144,7 +143,6 @@ int parseHexInteger(char* input) {
     // Remove character 'H'
     input[input_len - 1] = '\0';
     long result = strtol(input, NULL, 16);
-    printf("Parsed hex integer: %d\n", result);
     return T_INTEGER;
 }
 
@@ -178,14 +176,12 @@ int parseHexString(char* input) {
     }
 
     result[result_index] = '\0';
-    printf("Parsed hex string: %s\n", result);
 
     return T_STRING;
 }
 
 int parseReal(char* input) {
     float result = strtof(input, NULL);
-    printf("Parsed real %f\n", result);
     return T_REAL;
 }
 
@@ -197,7 +193,6 @@ int parseString(char* input) {
     strcpy(result, input + 1);
 
     result[input_len - 2] = '\0';
-    printf("Parsed string: %s\n", result);
 
     return T_STRING;
 }
